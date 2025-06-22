@@ -6,7 +6,7 @@ const cors = require("cors");
 const colors = require("colors");
 
 const mongooseURI =
-  "mongodb+srv://ndzenyuyjones:<db_password>@epoc.fezqjvq.mongodb.net/?retryWrites=true&w=majority&appName=epoc"; //process.env.MONGO_URI || "mongodb://localhost:27017/emart";
+  "mongodb+srv://ndzenyuyjones:IuXLKCfwvXGbIdJw@epoc.fezqjvq.mongodb.net/?retryWrites=true&w=majority&appName=epoc"; //process.env.MONGO_URI || "mongodb://localhost:27017/emart";
 
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
