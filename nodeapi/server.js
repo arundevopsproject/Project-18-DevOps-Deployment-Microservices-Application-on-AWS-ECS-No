@@ -5,8 +5,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const colors = require("colors");
 
-const mongooseURI =
-  "mongodb+srv://ndzenyuyjones:IuXLKCfwvXGbIdJw@epoc.fezqjvq.mongodb.net/epoc?retryWrites=true&w=majority&appName=epoc"; //process.env.MONGO_URI || "mongodb://localhost:27017/emart";
+const mongooseURI = process.env.MONGO_URI || "mongodb://localhost:27017/emart";
 
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
