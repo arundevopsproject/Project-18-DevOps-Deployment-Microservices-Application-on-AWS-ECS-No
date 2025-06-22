@@ -29,8 +29,6 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/shop", shopRoutes);
 
-console.log("MONGO_URI:", process.env.MONGO_URI);
-
 mongoose
   .connect(mongooseURI, {
     useNewUrlParser: true,
