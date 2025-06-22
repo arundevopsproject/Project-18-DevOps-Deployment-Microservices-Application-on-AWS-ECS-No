@@ -5,11 +5,11 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const colors = require("colors");
 
-const mongooseURI = require("./config/keys").mongoURI;
+const mongooseURI =
+  "mongodb+srv://ndzenyuyjones:<db_password>@epoc.fezqjvq.mongodb.net/?retryWrites=true&w=majority&appName=epoc"; //process.env.MONGO_URI || "mongodb://localhost:27017/emart";
 
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
-
 
 const app = express();
 
@@ -20,19 +20,22 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/images", express.static(path.join(__dirname, "images")));
 
-app.use(express.static(process.cwd()+"/client/dist/client/"));
+app.use(express.static(process.cwd() + "/client/dist/client/"));
 
-
-app.get('/', (req,res) => {
-  res.sendFile(process.cwd()+"/client/dist/client/index.html")
-})
+app.get("/", (req, res) => {
+  res.sendFile(process.cwd() + "/client/dist/client/index.html");
+});
 
 app.use("/api/user", userRoutes);
 app.use("/api/shop", shopRoutes);
 
+console.log("MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
-  .connect(mongooseURI)
+  .connect(mongooseURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
     const port = process.env.PORT || 5000;
     const server = app.listen(port, () => {
@@ -40,4 +43,4 @@ mongoose
     });
     console.log("\nConnected to".magenta, "E-MART".cyan, "database".magenta);
   })
-  .catch(err => console.log("Error connecting to database".cyan, err));
+  .catch((err) => console.log("Error connecting to database".cyan, err));
