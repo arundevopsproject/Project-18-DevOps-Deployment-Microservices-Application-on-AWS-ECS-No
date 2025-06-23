@@ -1,0 +1,62 @@
+Parameters:
+  GitHubOrg:
+    Description: Name of GitHub Username (case sensitive)
+    Type: String
+    Default: "Ndzenyuy"
+
+  RepositoryName:
+    Description: Name of GitHub Repository (case sensitive)
+    Type: String
+    Default: "day-1-deploy_microservices_to_ecs"
+
+  OIDCProviderArn:
+    Description: ARN of the GitHub OIDC Provider (Leave blank to create one)
+    Type: String
+    Default: "arn:aws:iam::997450571655:oidc-provider/token.actions.githubusercontent.com"
+
+  OIDCAudience:
+    Description: Audience supplied to configure-aws-credentials.
+    Type: String
+    Default: "sts.amazonaws.com"
+
+Conditions:
+  CreateOIDCProvider: !Equals 
+    - !Ref OIDCProviderArn
+    - ""
+
+Resources:
+  GithubOidc:
+    Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - !Ref OIDCAudience
+      ThumbprintList:
+        - "74f3a68f16524f15424927704c9506f55a9316bd"  # Replace with actual thumbprint
+
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: !Ref OIDCAudience
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
+
+Outputs:
+  RoleArn:
+    Description: IAM Role ARN for GitHub Actions
+    Value: !GetAtt Role.Arn
+
+
