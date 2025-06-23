@@ -45,18 +45,6 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Get version from VERSION file
-        id: get-version
-        run: |
-          if [ -f VERSION ]; then
-            VERSION=$(cat VERSION)
-          else
-            echo "VERSION file not found. Exiting..."
-            exit 1
-          fi
-          echo "Current version: $VERSION"
-          echo version=$VERSION >> $GITHUB_OUTPUT
-
       - name: Build, tag, and push image to Amazon ECR
         id: build-image
         uses: docker/build-push-action@v5
@@ -64,59 +52,5 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ steps.get-version.outputs.version }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:$ {{ github.sha }}
             ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
-
-  deploy:
-    needs: build
-    name: Deploy to ECS
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ vars.AWS_GITHUB_ROLE }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Get version from VERSION file
-        id: get-version
-        run: |
-          if [ -f VERSION ]; then
-            VERSION=$(cat VERSION)
-          else
-            echo "VERSION file not found. Exiting..."
-            exit 1
-          fi
-          echo "Current version: $VERSION"
-          echo version=$VERSION >> $GITHUB_OUTPUT
-
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition \
-          --task-definition ${{ vars.ECS_PROJECT }}-Task \
-          --query taskDefinition \
-          --region ${{ vars.AWS_REGION }} > task-definition.json
-
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: ${{ vars.ECS_PROJECT }}-Container
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ steps.get-version.outputs.version }}
-
-      - name: Deploy to ECS
-        id: deploy-ecs
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          service: ${{ vars.ECS_PROJECT }}-Service
-          cluster: ${{ vars.ECS_PROJECT }}-Cluster
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          wait-for-service-stability: true
