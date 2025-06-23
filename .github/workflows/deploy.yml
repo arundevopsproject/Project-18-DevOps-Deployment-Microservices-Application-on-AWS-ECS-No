@@ -25,6 +25,7 @@ env:
   ECR_REPOSITORY_CLIENT: "client"
   ECR_REPOSITORY_JAVA: "javaapi"
   ECR_REPOSITORY_NODEAPI: "nodeapi"
+  ECR_REPOSITORY_NGINX: "nginx"
 
 jobs:
   build:
@@ -82,3 +83,15 @@ jobs:
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:${{ github.run_number }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:latest
+
+      - name: Build and push Nginx image
+        id: build-image-nginx
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          file: ./nginx/Dockerfile
+          push: true
+          provenance: false
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:latest
