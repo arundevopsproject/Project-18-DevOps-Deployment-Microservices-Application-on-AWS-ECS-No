@@ -20,8 +20,11 @@ env:
 
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
   ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
+
+  ECR_REPOSITORY_CLIENT: "client"
+  ECR_REPOSITORY_JAVA: "java"
+  ECR_REPOSITORY_NODEAPI: "nodeapi"
 
 jobs:
   build:
@@ -55,8 +58,8 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-angular:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-angular:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:latest
 
       - name: Build and push Java image
         id: build-image-java
@@ -65,8 +68,8 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-java:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-java:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:latest
 
       - name: Build and push Node.js image
         id: build-image-node
@@ -77,5 +80,5 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-node:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}-node:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}-node:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}-node:latest
