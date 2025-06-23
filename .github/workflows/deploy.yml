@@ -58,8 +58,8 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}-client:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}-client:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:latest
 
       - name: Build and push Java image
         id: build-image-java
@@ -68,8 +68,8 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}-javaapi:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}-javaapi:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:latest
 
       - name: Build and push Node.js image
         id: build-image-node
@@ -80,5 +80,5 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}nodeapi:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}nodeapi:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:latest
