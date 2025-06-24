@@ -6,6 +6,7 @@ const cors = require("cors");
 const colors = require("colors");
 
 const mongooseURI = process.env.MONGO_URI || "mongodb://localhost:27017/emart";
+console.log("##############mongo db uri" + MONGO_URI);
 
 const userRoutes = require("./routes/user");
 const shopRoutes = require("./routes/shop");
