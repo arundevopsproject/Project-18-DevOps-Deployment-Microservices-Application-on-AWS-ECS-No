@@ -118,7 +118,7 @@ jobs:
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          service: ${{ env.ECS_NGINX_TASK }}-Service
+          service: nginx-task-service-121dhxnr
           cluster: ecs-task
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           wait-for-service-stability: true
