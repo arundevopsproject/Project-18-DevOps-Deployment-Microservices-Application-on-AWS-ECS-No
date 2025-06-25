@@ -1,4 +1,4 @@
-name: Angular CI/CD
+name: Node-api CI/CD
 
 on:
   push:

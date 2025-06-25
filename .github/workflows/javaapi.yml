@@ -1,4 +1,4 @@
-name: Angular CI/CD
+name: Java-api CI/CD
 
 on:
   push:
