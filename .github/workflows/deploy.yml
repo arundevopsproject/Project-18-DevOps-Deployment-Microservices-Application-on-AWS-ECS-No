@@ -17,6 +17,7 @@ permissions:
 env:
   AWS_REGION: "us-east-1"
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
+  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
 
   ECR_REPOSITORY_NGINX: "nginx"
 
@@ -42,6 +43,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Get version from VERSION file
+        id: get-version
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "VERSION file not found. Exiting..."
+            exit 1
+          fi
+          echo "Current version: $VERSION"
+          echo version=$VERSION >> $GITHUB_OUTPUT
+
       # Build and push nginx image
       - name: Build and push Nginx image
         id: build-image-nginx
@@ -52,5 +65,59 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ steps.get-version.outputs.version }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:latest
+
+  deploy:
+    needs: build
+    name: Deploy to ECS-nginx task
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+          --task-definition ${{ secrets.ECS_PROJECT }}-Task \
+          --query taskDefinition \
+          --region ${{ env.AWS_REGION }} > task-definition.json
+
+      - name: Get version from VERSION file
+        id: get-version
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "VERSION file not found. Exiting..."
+            exit 1
+          fi
+          echo "Current version: $VERSION"
+          echo version=$VERSION >> $GITHUB_OUTPUT
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ secrets.ECS_PROJECT }}-Container
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ steps.get-version.outputs.version }}
+
+      - name: Deploy to ECS
+        id: deploy-ecs
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          service: ${{ env.ECS_PROJECT }}-Service
+          cluster: ${{ env.ECS_PROJECT }}-Cluster
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          wait-for-service-stability: true
