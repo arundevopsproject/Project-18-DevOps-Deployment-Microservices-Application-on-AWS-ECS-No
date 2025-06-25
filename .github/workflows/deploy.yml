@@ -21,6 +21,8 @@ env:
 
   ECR_REPOSITORY_NGINX: "nginx"
   ECS_NGINX_TASK: "nginx-task"
+  ECS_CLUSTER: "ecs-task"
+  ECS_SERVICE: "nginx-task-service-121dhxnr"
 
 jobs:
   build:
@@ -111,14 +113,14 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: nginx
+          container-name: ${{ env.ECR_REPOSITORY_NGINX }}
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ steps.get-version.outputs.version }}
 
       - name: Deploy to ECS
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
-          service: nginx-task-service-121dhxnr
-          cluster: ecs-task
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           wait-for-service-stability: true
