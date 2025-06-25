@@ -90,7 +90,7 @@ jobs:
       - name: Download task definition
         run: |
           aws ecs describe-task-definition \
-          --task-definition nginx-task \
+          --task-definition ${{ env.ECS_NGINX_TASK }} \
           --query taskDefinition \
           --region ${{ env.AWS_REGION }} > task-definition.json
 
@@ -111,7 +111,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: ${{ env.ECS_NGINX_TASK }}-Container
+          container-name: nginx
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ steps.get-version.outputs.version }}
 
       - name: Deploy to ECS
@@ -119,6 +119,6 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           service: ${{ env.ECS_NGINX_TASK }}-Service
-          cluster: ${{ env.ECS_NGINX_TASK }}-Cluster
+          cluster: ecs-task
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           wait-for-service-stability: true
