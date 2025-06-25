@@ -17,12 +17,11 @@ permissions:
 env:
   AWS_REGION: "us-east-1"
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
-  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
 
   ECR_REPOSITORY_NGINX: "nginx"
   ECS_NGINX_TASK: "nginx-task"
   ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "nginx-task-service-121dhxnr"
+  ECS_SERVICE: "nginx-task-service"
 
 jobs:
   build:

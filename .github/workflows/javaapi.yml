@@ -23,8 +23,6 @@ env:
 
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
-  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
-
   ECR_REPOSITORY_CLIENT: "client"
   ECR_REPOSITORY_JAVA: "javaapi"
   ECR_REPOSITORY_NODEAPI: "nodeapi"
@@ -32,7 +30,7 @@ env:
 
   ECS_JAVA_TASK: "java-task"
   ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "java-task-service-xsh8ud3g"
+  ECS_SERVICE: "java-task-service"
 
 jobs:
   build-javaapi:

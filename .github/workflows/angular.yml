@@ -23,7 +23,6 @@ env:
 
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
-  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
 
   ECR_REPOSITORY_CLIENT: "client"
   ECR_REPOSITORY_JAVA: "javaapi"
@@ -32,7 +31,7 @@ env:
 
   ECS_ANGULAR_TASK: "angular-task"
   ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "angular-task-service-cjaf866j"
+  ECS_SERVICE: "angular-task-service"
 
 jobs:
   build-angular:
