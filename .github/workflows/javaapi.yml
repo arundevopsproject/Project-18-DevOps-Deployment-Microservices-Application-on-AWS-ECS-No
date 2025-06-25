@@ -54,6 +54,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Get version from VERSION file
+        id: get-version
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "VERSION file not found. Exiting..."
+            exit 1
+          fi
+          echo "Current version: $VERSION"
+          echo version=$VERSION >> $GITHUB_OUTPUT
+
         # Java API
       - name: Build and push Java image
         id: build-image-java
@@ -62,7 +74,7 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:${{ steps.get-version.outputs.version }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_JAVA }}:latest
 
   deploy:

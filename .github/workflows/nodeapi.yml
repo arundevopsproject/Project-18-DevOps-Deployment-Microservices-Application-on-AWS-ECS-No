@@ -23,7 +23,6 @@ env:
 
   AWS_REGION: ${{ secrets.AWS_REGION }}
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
-  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
 
   ECR_REPOSITORY_CLIENT: "client"
   ECR_REPOSITORY_JAVA: "javaapi"
@@ -54,6 +53,18 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Get version from VERSION file
+        id: get-version
+        run: |
+          if [ -f VERSION ]; then
+            VERSION=$(cat VERSION)
+          else
+            echo "VERSION file not found. Exiting..."
+            exit 1
+          fi
+          echo "Current version: $VERSION"
+          echo version=$VERSION >> $GITHUB_OUTPUT
+
         # Node API
       - name: Build and push Node.js image
         id: build-image-node
@@ -64,7 +75,7 @@ jobs:
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:${{ steps.get-version.outputs.version }}
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NODEAPI }}:latest
 
   deploy:
