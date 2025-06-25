@@ -1,12 +1,12 @@
-name: Deploy to ECS
+name: Angular CI/CD
 
 on:
   push:
     paths:
-      - "nginx/**"
+      - "client/**"
   pull_request:
     paths:
-      - "nginx/**"
+      - "client/**"
 
   workflow_dispatch:
 
@@ -15,16 +15,24 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: "us-east-1"
-  AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+  MYSQL_USER: ${{ secrets.MYSQL_USER }}
+  MYSQL_PASS: ${{ secrets.MYSQL_PASS }}
+  MYSQL_DB: ${{ secrets.MYSQL_DB }}
 
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
+  ECS_PROJECT: ${{ secrets.ECS_PROJECT }}
+
+  ECR_REPOSITORY_CLIENT: "client"
+  ECR_REPOSITORY_JAVA: "javaapi"
+  ECR_REPOSITORY_NODEAPI: "nodeapi"
   ECR_REPOSITORY_NGINX: "nginx"
 
 jobs:
-  build:
-    name: Build and Push to ECR
+  build-angular:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,15 +50,15 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      # Build and push nginx image
-      - name: Build and push Nginx image
-        id: build-image-nginx
+      #Angular
+      - name: Build and push Angular image
+        id: build-image-angular
         uses: docker/build-push-action@v5
         with:
-          context: ./nginx
-          file: ./nginx/Dockerfile
+          context: ./client
+          file: ./client/Dockerfile
           push: true
           provenance: false
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:${{ github.run_number }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_NGINX }}:latest
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:${{ github.run_number }}
+            ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_CLIENT }}:latest
