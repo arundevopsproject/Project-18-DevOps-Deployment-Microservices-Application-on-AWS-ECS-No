@@ -31,7 +31,7 @@ env:
 
   ECS_NODEAPI_TASK: "node-task"
   ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "node-task-service"
+  ECS_SERVICE: "node-task-service-ye9bdzrm"
 
 jobs:
   build-nodeapi:

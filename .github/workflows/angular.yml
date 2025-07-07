@@ -31,7 +31,7 @@ env:
 
   ECS_ANGULAR_TASK: "angular-task"
   ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "angular-task-service"
+  ECS_SERVICE: "angular-task-service-dei17ls6"
 
 jobs:
   build-angular:
