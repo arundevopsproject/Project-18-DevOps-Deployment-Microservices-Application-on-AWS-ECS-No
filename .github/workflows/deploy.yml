@@ -19,9 +19,9 @@ env:
   AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
 
   ECR_REPOSITORY_NGINX: "nginx"
-  ECS_NGINX_TASK: "nginx-task"
-  ECS_CLUSTER: "ecs-task"
-  ECS_SERVICE: "nginx-task-service"
+  ECS_NGINX_TASK: "ecs-microservices-deployment-nginx-Task"
+  ECS_CLUSTER: "ecs-microservices-deployment-Cluster"
+  ECS_SERVICE: "ecs-microservices-deployment-Service-nginx"
 
 jobs:
   build:
